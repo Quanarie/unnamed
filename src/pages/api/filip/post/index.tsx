@@ -7,11 +7,13 @@ export default async function handler(
 ) {
   const {content} = req.body;
   try {
-    const newPhrase = await prisma.phrase.create({
-      data: {content},
-    });
-    res.status(201).json({result: newPhrase});
+    const newPhrase = await prisma.phrase.create(
+      {
+        data: {content},
+      }
+    );
+    res.status(201).json(newPhrase);
   } catch (error) {
-    res.status(500).json({error: "Failed to create phrase"});
+    res.status(500).json('Failed to create phrase');
   }
 }

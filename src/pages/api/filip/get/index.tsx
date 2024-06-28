@@ -7,9 +7,9 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const result: Phrase[] = await prisma.phrase.findMany();
-    res.status(200).send({result})
-  } catch (err) {
-    res.status(500).send({error: 'Failed to fetch phrases'})
+    const phrases: Phrase[] = await prisma.phrase.findMany();
+    res.status(200).json(phrases)
+  } catch (error) {
+    res.status(500).json('Failed to fetch phrases')
   }
 }
