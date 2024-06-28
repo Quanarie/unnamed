@@ -1,19 +1,14 @@
 import {NextApiRequest, NextApiResponse} from 'next';
-import {prisma} from '../../../../app/prisma/prisma';
+import {supabase} from "@/supabase/supabase";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   const {content} = req.body;
-  try {
-    const newPhrase = await prisma.phrase.create(
-      {
-        data: {content},
-      }
-    );
-    res.status(201).json(newPhrase);
-  } catch (error) {
-    res.status(500).json('Failed to create phrase');
+  const {data, error} = await supabase.from('phrases').insert([{content}]);
+  if (error) {
+    return res.status(500).json({error: error.message});
   }
+  res.status(201).json(data);
 }
