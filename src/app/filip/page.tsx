@@ -56,7 +56,7 @@ const Page = () => {
           onChange={(e) => setNewPhrase(e.target.value)}
           placeholder="Add a new phrase"
           required
-          className="w-full px-3 py-2 mb-4 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 mb-4 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
         />
         <button
           type="submit"
