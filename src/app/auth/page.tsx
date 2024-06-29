@@ -23,7 +23,7 @@ export default function Page() {
     );
 
     if (response?.error) {
-      setError('either passwords do not match or registration did not succeed.');
+      setError('Either passwords do not match or registration did not succeed.');
     } else {
       router.push('/');
     }
