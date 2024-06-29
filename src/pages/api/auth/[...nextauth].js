@@ -15,7 +15,7 @@ async function registerUser(credentials) {
     return null;
   }
 
-  return (await fetchUser(credentials.email)).userInDb;
+  return (await fetchUser(credentials)).userInDb;
 }
 
 async function fetchUser(credentials) {
