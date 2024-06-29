@@ -4,11 +4,11 @@ import bcrypt from 'bcrypt';
 import {supabase} from '../../../supabase/supabase';
 import {createUser, fetchUserByEmail} from '@/repositories/user-repository';
 
-async function registerUser(credentials) {
+async function registerUser(email: string, password: string) {
   const saltRounds = 10;
-  const hashedPassword = await bcrypt.hash(credentials.password, saltRounds);
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-  const {user, error: error} = await createUser(credentials.email, hashedPassword);
+  const {user, error: error} = await createUser(email, hashedPassword);
   if (error) {
     return null;
   }
@@ -29,13 +29,13 @@ export const authOptions = {
           return null;
         }
 
-        const {user, selectError: fetchError} = await fetchUserByEmail(credentials.email);
+        const {user, error: error} = await fetchUserByEmail(credentials.email);
 
         if (!user) {
-          return await registerUser(credentials);
+          return await registerUser(credentials.email, credentials.password);
         }
 
-        if (fetchError || !await bcrypt.compare(credentials.password, user.password)) {
+        if (error || !await bcrypt.compare(credentials.password, user.password)) {
           return null;
         }
 
