@@ -1,14 +1,14 @@
-import type {Metadata} from "next";
-import {Inter} from "next/font/google";
-import "./globals.css";
-import React from "react";
-import SessionWrapper from "@/app/session-provider";
+import type {Metadata} from 'next';
+import {Inter} from 'next/font/google';
+import './globals.css';
+import React from 'react';
+import SessionWrapper from '@/app/session-provider';
 
-const inter = Inter({subsets: ["latin"]});
+const inter = Inter({subsets: ['latin']});
 
 export const metadata: Metadata = {
-  title: "unnamed",
-  description: "unnamed",
+  title: 'unnamed',
+  description: 'unnamed',
 };
 
 export default function RootLayout({
@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <SessionWrapper>
-      <html lang="en">
+      <html lang='en'>
       <body className={inter.className}>{children}</body>
       </html>
     </SessionWrapper>

@@ -1,16 +1,8 @@
 import {NextApiRequest, NextApiResponse} from 'next';
-import {supabase} from "@/supabase/supabase";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/pages/api/auth/[...nextauth]";
-
-async function fetchUserId(email: string) {
-  const {data: userInDb, error: selectError} = await supabase
-    .from('users')
-    .select('*')
-    .eq('email', email)
-    .single();
-  return {userInDb, selectError};
-}
+import {getServerSession} from 'next-auth';
+import {authOptions} from '@/pages/api/auth/[...nextauth]';
+import {fetchUserByEmail} from '@/repositories/user-repository';
+import {fetchPhrasesLike, insertPhrase} from '@/repositories/phrase-repository';
 
 export default async function handler(
   req: NextApiRequest,
@@ -18,34 +10,29 @@ export default async function handler(
 ) {
   const session = await getServerSession(req, res, authOptions);
 
-  let userInDb, selectError;
+  let user, fetchUserError;
   if (session && session.user) {
-    ({userInDb, selectError} = await fetchUserId(session.user.email as string));
+    ({user, error: fetchUserError} = await fetchUserByEmail(session.user.email as string));
 
-    if (selectError) {
-      return res.status(500).json({error: selectError.message});
+    if (fetchUserError) {
+      return res.status(500).json({error: fetchUserError.message});
     }
   }
 
   let content = req.body.content;
   content = content.toLowerCase();
 
-  const {data: existingPhrases, error: fetchError} = await supabase
-    .from('phrases')
-    .select('*')
-    .ilike('content', content);
+  const {phrases, error: fetchPhrasesError} = await fetchPhrasesLike(content);
 
-  if (fetchError) {
-    return res.status(500).json({error: fetchError.message});
+  if (fetchPhrasesError) {
+    return res.status(500).json({error: fetchPhrasesError.message});
   }
 
-  if (existingPhrases && existingPhrases.length > 0) {
+  if (phrases && phrases.length > 0) {
     return res.status(400).json({error: 'Content must be unique. This phrase already exists.'});
   }
 
-  const {error} = await supabase
-    .from('phrases')
-    .insert([{content, user_id: userInDb ? userInDb.id : null}]);
+  const {error} = await insertPhrase(content, user ? user.id : null);
 
   if (error) {
     return res.status(500).json({error: error.message});
