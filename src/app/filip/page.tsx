@@ -1,10 +1,15 @@
 "use client";
 import React, {useEffect, useState} from 'react';
-import {Phrase} from "@prisma/client";
+
+class Phrase {
+  constructor(public id: number, public content: string) {
+  }
+}
 
 const Page = () => {
   const [phrases, setPhrases] = useState<Phrase[]>([]);
   const [newPhrase, setNewPhrase] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchPhrases();
@@ -18,8 +23,9 @@ const Page = () => {
 
   const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setError(null);
 
-    await fetch('/api/filip/post', {
+    const response = await fetch('/api/filip/post', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -28,8 +34,13 @@ const Page = () => {
       }
     );
 
-    setNewPhrase('');
-    await fetchPhrases();
+    if (response.status === 400) {
+      const errorData = await response.json();
+      setError(errorData.error);
+    } else {
+      setNewPhrase('');
+      await fetchPhrases();
+    }
   };
 
   const deletePhrase = async (id: number) => {
@@ -65,6 +76,8 @@ const Page = () => {
           Add Phrase
         </button>
       </form>
+
+      {error && <p className="text-red-500 mb-4">{error}</p>}
 
       <ul className="flex flex-col gap-y-2 list-disc pl-5 w-full max-w-md h-96 overflow-y-auto">
         {
