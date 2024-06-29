@@ -10,6 +10,11 @@ export default function Page() {
             <p className="text-blue-500 text-xl hover:underline">Filip</p>
           </Link>
         </li>
+        <li className="mb-2">
+          <Link href="/auth">
+            <p className="text-blue-500 text-xl hover:underline">Auth</p>
+          </Link>
+        </li>
       </ul>
     </main>
   );

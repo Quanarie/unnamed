@@ -1,4 +1,5 @@
 "use client";
+
 import React, {useEffect, useState} from 'react';
 
 class Phrase {
@@ -6,7 +7,7 @@ class Phrase {
   }
 }
 
-const Page = () => {
+export default function Page() {
   const [phrases, setPhrases] = useState<Phrase[]>([]);
   const [newPhrase, setNewPhrase] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
@@ -27,14 +28,12 @@ const Page = () => {
 
     const response = await fetch('/api/filip/post', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({content: newPhrase})
       }
     );
 
-    if (response.status === 400) {
+    if (!response.ok) {
       const errorData = await response.json();
       setError(errorData.error);
     } else {
@@ -46,9 +45,7 @@ const Page = () => {
   const deletePhrase = async (id: number) => {
     await fetch('/api/filip/delete', {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({id})
       }
     );
@@ -59,6 +56,8 @@ const Page = () => {
   return (
     <main className="flex flex-col items-center justify-center p-4">
       <h1 className="text-3xl font-bold mb-6 text-center">Filip</h1>
+
+      {error && <p className="text-red-500 mb-4">{error}</p>}
 
       <form onSubmit={handleFormSubmit} className="mb-6 w-full max-w-md">
         <input
@@ -76,8 +75,6 @@ const Page = () => {
           Add Phrase
         </button>
       </form>
-
-      {error && <p className="text-red-500 mb-4">{error}</p>}
 
       <ul className="flex flex-col gap-y-2 list-disc pl-5 w-full max-w-md h-96 overflow-y-auto">
         {
@@ -101,5 +98,3 @@ const Page = () => {
     </main>
   );
 }
-
-export default Page;
