@@ -7,10 +7,23 @@ export default async function handler(
 ) {
   const {data, error} = await supabase
     .from('phrases')
-    .select('*');
+    .select(`
+      *,
+      users (email)
+    `);
 
   if (error) {
     return res.status(500).json({error: error.message});
   }
-  res.status(200).json(data);
+
+  const result = data.map((phrase: any) => (
+      {
+        id: phrase.id,
+        content: phrase.content,
+        user_email: phrase.users?.email,
+      }
+    )
+  );
+
+  return res.status(200).json(result);
 }

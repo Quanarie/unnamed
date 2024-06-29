@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
 import React, {useEffect, useState} from 'react';
+import {useSession} from "next-auth/react";
 
 class Phrase {
-  constructor(public id: number, public content: string) {
+  constructor(public id: number, public content: string, public user_email: string) {
   }
 }
 
@@ -11,6 +12,7 @@ export default function Page() {
   const [phrases, setPhrases] = useState<Phrase[]>([]);
   const [newPhrase, setNewPhrase] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const {data: session} = useSession();
 
   useEffect(() => {
     fetchPhrases();
@@ -29,7 +31,7 @@ export default function Page() {
     const response = await fetch('/api/filip/post', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({content: newPhrase})
+        body: JSON.stringify({content: newPhrase, session: session})
       }
     );
 
@@ -77,23 +79,22 @@ export default function Page() {
       </form>
 
       <ul className="flex flex-col gap-y-2 list-disc pl-5 w-full max-w-md h-96 overflow-y-auto">
-        {
-          phrases.slice().reverse().map(
-            (phrase) => (
-              <li key={phrase.id}>
-                <div className="flex justify-between items-center">
-                  <span>{phrase.content}</span>
-                  <button
-                    onClick={() => deletePhrase(phrase.id)}
-                    className="ml-4 bg-red-600 hover:bg-red-800 text-white font-bold py-1 px-2 rounded-md"
-                  >
-                    ✖
-                  </button>
-                </div>
-              </li>
-            )
-          )
-        }
+        {phrases.slice().reverse().map((phrase) => (
+          <li key={phrase.id}>
+            <div className="flex justify-between items-center">
+              <span className="flex-1 text-white">{phrase.content}</span>
+              <span className="flex-1 text-gray-400 text-right">{phrase.user_email}</span>
+              {(!phrase.user_email || (session && session.user && session.user.email === phrase.user_email)) && (
+                <button
+                  onClick={() => deletePhrase(phrase.id)}
+                  className="ml-4 bg-red-600 hover:bg-red-800 text-white font-bold py-1 px-2 rounded-md"
+                >
+                  ✖
+                </button>
+              )}
+            </div>
+          </li>
+        ))}
       </ul>
     </main>
   );

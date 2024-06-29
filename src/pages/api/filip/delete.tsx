@@ -6,14 +6,14 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const {id} = req.body;
-  const {data, error} = await supabase
+  const {error: deleteError} = await supabase
     .from('phrases')
     .delete()
     .eq('id', id);
 
-  if (error) {
-    return res.status(500).json({error: error.message});
+  if (deleteError) {
+    return res.status(500).json({error: deleteError.message});
   }
 
-  res.status(200).json(data);
+  return res.status(200).json({success: true});
 }
