@@ -3,6 +3,7 @@ import {getServerSession} from 'next-auth';
 import {authOptions} from '@/pages/api/auth/[...nextauth]';
 import {fetchUserByEmail} from '@/repositories/user-repository';
 import {fetchPhrasesLike, insertPhrase} from '@/repositories/phrase-repository';
+import {logUserActivity} from "@/logging/log";
 
 export default async function handler(
   req: NextApiRequest,
@@ -37,6 +38,12 @@ export default async function handler(
   if (error) {
     return res.status(500).json({error: error.message});
   }
+
+  await logUserActivity(
+    user ? user.email : "Not registered user",
+    'filip/post',
+    JSON.stringify(content)
+  );
 
   return res.status(200).json({success: true});
 }

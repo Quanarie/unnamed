@@ -3,6 +3,7 @@ import {getServerSession} from 'next-auth';
 import {authOptions} from '@/pages/api/auth/[...nextauth]';
 import {fetchUserByEmail} from '@/repositories/user-repository';
 import {deletePhrase} from '@/repositories/phrase-repository';
+import {logUserActivity} from "@/logging/log";
 
 export default async function handler(
   req: NextApiRequest,
@@ -28,6 +29,12 @@ export default async function handler(
   if (deleteError) {
     return res.status(500).json({error: deleteError.message});
   }
+
+  await logUserActivity(
+    user ? user.email : "Not registered user",
+    'filip/delete',
+    JSON.stringify(req.body)
+  );
 
   return res.status(200).json({success: true});
 }
