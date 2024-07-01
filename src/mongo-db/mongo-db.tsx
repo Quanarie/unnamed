@@ -1,14 +1,14 @@
-import {MongoClient} from 'mongodb';
+import {MongoClient} from "mongodb";
 
-const uri = process.env.MONGODB_URI;
-
-if (!uri) {
-  throw new Error('Please add your Mongo URI to .env.local');
+export async function getMongoClient() {
+  if (!global.mongoClientPromise) {
+    const client = new MongoClient(process.env.MONGODB_URI as string);
+    global.mongoClientPromise = client.connect();
+  }
+  return global.mongoClientPromise;
 }
 
-const mongoDbClient = new MongoClient(uri);
-
-export const mongoDb = async () => {
-  await mongoDbClient.connect();
-  return mongoDbClient;
-};
+export async function getMongoDb(name: string) {
+  const mongoClient = await getMongoClient();
+  return mongoClient.db(name);
+}

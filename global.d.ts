@@ -1,5 +1,6 @@
-import { SupabaseClient } from '@supabase/supabase-js';
+import {MongoClient} from "mongodb";
 
 declare global {
-  var supabase: SupabaseClient | undefined;
+  var mongoClientPromise: Promise<MongoClient>;
+  var clientPromise: Promise<MongoClient>;
 }

@@ -1,8 +1,8 @@
-import {mongoDb} from "@/mongo-db/mongo-db";
+import {getMongoDb} from "@/mongo-db/mongo-db";
+
 
 export const logUserActivity = async (email: string, action: string, details: string) => {
-  const client = await mongoDb();
-  const db = client.db('logs');
+  const db = await getMongoDb('logs');
   const logsCollection = db.collection('activity-logs');
 
   const logEntry = {
